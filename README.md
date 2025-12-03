@@ -18,3 +18,26 @@ It features an automated **Anomaly Detection Engine** that flags network degrada
 * **Non-Blocking Concurrency:** Backend uses `asyncio` to probe network nodes without blocking the WebSocket heartbeat.
 * **Real-Time Streaming:** Full-duplex communication via `ws://` protocol.
 * **Automated Alerts:** Statistical analysis detects jitter and connection drops.
+
+Here are the steps to run it locally on your machine (I'll realase a live demo soon) :
+
+git clone [https://github.com/MelvynAV/SignalStream.git](https://github.com/MelvynAV/SignalStream.git)
+cd SignalStream
+
+cd backend
+
+# Install dependencies
+pip install fastapi uvicorn requests websockets
+
+# Run the Server
+python -m uvicorn main:app --reload
+
+cd frontend
+
+# Install dependencies
+npm install
+
+# Run the React Dashboard
+npm run dev
+
+Now click on the local host link and there you go you should be able to analyze your network latency (Ctrl+Click)
