@@ -4,6 +4,9 @@ import requests
 import random
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+import os
+
 
 app = FastAPI()
 
@@ -70,3 +73,6 @@ async def websocket_endpoint(websocket: WebSocket):
             
     except Exception as e:
         print(f"Client disconnected: {e}")
+
+if os.path.exists("static"):
+    app.mount("/", StaticFiles(directory="static", html=True), name="static")
