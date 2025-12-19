@@ -1,16 +1,16 @@
 import time
 import asyncio
-import requests
 import random
+import requests
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 import os
-
 
 app = FastAPI()
 
-# Enable CORS
+# Enable CORS for local development
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -18,66 +18,100 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Simulated network nodes with realistic regional differences
+NODES = ["US-East", "EU-West", "Asia-Pacific", "South-America"]
+
 TARGET_URL = "https://www.google.com"
 
-# --- THE FIX: Run the ping in a separate thread ---
+# Blocking real latency measurement
 def get_real_latency():
-    """Blocking call to measure HTTP latency."""
     try:
         start_time = time.time()
-        # Timeout reduced to 1 second to prevent long hangs
-        requests.get(TARGET_URL, timeout=1) 
+        requests.get(TARGET_URL, timeout=1)
         latency = (time.time() - start_time) * 1000
         return round(latency, 2)
-    except:
+    except Exception:
         return None
 
+# Async-safe wrapper
 async def get_latency_safe():
-    """Async wrapper that prevents the server from freezing."""
     loop = asyncio.get_running_loop()
-    # run_in_executor moves the slow 'requests' call to a background thread
     return await loop.run_in_executor(None, get_real_latency)
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-    print("Client connected!") # Debug print
-    
+    print("Client connected!")
+
     try:
         while True:
-            # 1. Try to get real latency
-            latency = await get_latency_safe()
-            
-            # 2. DEMO MODE FAILSAFE
-            # If real ping fails (firewall/internet issue), simulate data 
-            # so the graph still looks cool for the interview.
-            if latency is None:
-                latency = random.uniform(20, 150) # Fake latency between 20-150ms
-            
-            # Create packet
-            data = {
-                "timestamp": time.strftime("%H:%M:%S"),
-                "latency": round(latency, 2),
-                "status": "Normal"
-            }
+            # Try real latency once per cycle (shared baseline)
+            real_latency = await get_latency_safe()
 
-            # Anomaly Logic
-            if latency > 200:
-                data["status"] = "High Latency Warning"
-            
-            # Send to frontend
-            await websocket.send_json(data)
-            
-            # Wait 0.5s
+            for node in NODES:
+                # Use real latency as base if available, otherwise simulate
+                if real_latency is not None:
+                    base = real_latency
+                else:
+                    # Region-specific baseline + jitter
+                    if "Asia" in node:
+                        base = random.uniform(80, 180)
+                    elif "South-America" in node:
+                        base = random.uniform(100, 220)
+                    else:
+                        base = random.uniform(20, 80)
+
+                # Add jitter and occasional spikes
+                jitter = random.uniform(-30, 60)
+                latency = base + jitter
+
+                if random.random() < 0.06:  # ~6% chance of major spike
+                    latency += random.uniform(150, 400)
+
+                status = "High Latency Warning" if latency > 200 else "Normal"
+
+                data = {
+                    "node": node,
+                    "timestamp": time.strftime("%H:%M:%S"),
+                    "latency": round(max(0, latency), 2),
+                    "status": status
+                }
+
+                await websocket.send_json(data)
+
+            # ~2 updates per second across all nodes
             await asyncio.sleep(0.5)
-            
+
     except Exception as e:
         print(f"Client disconnected: {e}")
 
+# -------------------------------
+# Production Static File Serving
+# -------------------------------
+
+# For local development (when running separately)
 if os.path.exists("static"):
     app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
+# For production (Docker/Render) – serve Vite build from frontend/dist
+STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend", "dist")
+
+if os.path.exists(STATIC_DIR):
+    # Serve assets (JS, CSS, etc.)
+    app.mount("/assets", StaticFiles(directory=os.path.join(STATIC_DIR, "assets")), name="assets")
+
+    # Catch-all route for React Router (SPA)
+    @app.get("/{full_path:path}")
+    async def serve_react(full_path: str):
+        file_path = os.path.join(STATIC_DIR, full_path)
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
+        # Fallback to index.html for client-side routing
+        return FileResponse(os.path.join(STATIC_DIR, "index.html"))
+
+# -------------------------------
+# Local Development Runner
+# -------------------------------
 if __name__ == "__main__":
     import uvicorn
-    # This tells uvicorn to run the "app" object in this file on port 5000
     uvicorn.run(app, host="127.0.0.1", port=5000)
