@@ -1,14 +1,33 @@
+<div align="center">
+
 # 📡 SignalStream
 
-> **Real-Time Network Telemetry Dashboard**
-🔗 **[Live Demo](https://signal-stream-demo.onrender.com)** 🚀  
-*(Click to see real-time multi-region network telemetry streaming live!)*
+<h1>
+  <a href="https://your-render-url.onrender.com" target="_blank">
+    🔗 LIVE DEMO 🚀
+  </a>
+</h1>
 
-**SignalStream** is a full-stack application that streams and visualizes network latency metrics in **real time** using **WebSockets**. It is designed to demonstrate low-latency data pipelines, asynchronous backends, and live data visualization—skills commonly required in **backend, systems, and cloud-focused roles**.
+<p>
+  <strong>Click above for real-time multi-region network telemetry streaming!</strong>
+</p>
 
-Unlike traditional REST-based dashboards, SignalStream pushes data every **500 ms**, closely simulating enterprise-scale monitoring systems used in telecom and distributed infrastructure.
+<p>
+  <img src="https://img.shields.io/badge/status-live-brightgreen?style=for-the-badge" alt="Live"/>
+  <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React"/>
+  <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI"/>
+  <img src="https://img.shields.io/badge/WebSockets-4A154B?style=for-the-badge" alt="WebSockets"/>
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"/>
+  <img src="https://img.shields.io/badge/Render-000000?style=for-the-badge&logo=render&logoColor=white" alt="Render"/>
+</p>
 
----
+<br>
+
+<img src="./screenshot.png" alt="SignalStream Dashboard Preview" width="100%"/>
+
+<br>
+
+</div>
 
 ## 🚀 Highlights
 
