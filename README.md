@@ -1,7 +1,8 @@
 # 📡 SignalStream
 
 > **Real-Time Network Telemetry Dashboard**
-> 🚧 Still under construction
+🔗 **[Live Demo](https://signal-stream-demo.onrender.com)** 🚀  
+*(Click to see real-time multi-region network telemetry streaming live!)*
 
 **SignalStream** is a full-stack application that streams and visualizes network latency metrics in **real time** using **WebSockets**. It is designed to demonstrate low-latency data pipelines, asynchronous backends, and live data visualization—skills commonly required in **backend, systems, and cloud-focused roles**.
 
