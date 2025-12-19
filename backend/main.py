@@ -76,3 +76,8 @@ async def websocket_endpoint(websocket: WebSocket):
 
 if os.path.exists("static"):
     app.mount("/", StaticFiles(directory="static", html=True), name="static")
+
+if __name__ == "__main__":
+    import uvicorn
+    # This tells uvicorn to run the "app" object in this file on port 5000
+    uvicorn.run(app, host="127.0.0.1", port=5000)

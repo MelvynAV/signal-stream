@@ -11,7 +11,7 @@ function App() {
 
   useEffect(() => {
     // Connect to the Backend WebSocket
-    ws.current = new WebSocket("ws://127.0.0.1:8000/ws");
+    ws.current = new WebSocket("ws://127.0.0.1:5000/ws");
 
     ws.current.onopen = () => console.log("Connected to SignalStream Backend");
     
